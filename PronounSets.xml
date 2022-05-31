@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<pronounsets Load="Merge">
+  <!--
+      Reference:
+      Subjective - Subject
+      Objective - Object
+      PossessiveAdjective - Possessive determiner
+      SubstantivePossesive - Posessive pronoun
+      Reflexive - Reflexive
+  -->
+  <!-- it/its/itself -->
+  <pronounset
+      Subjective="it"
+      Objective="it"
+      PossessiveAdjective="its"
+      SubstantivePossessive="its"
+      Reflexive="itself"
+      />
+
+  <!-- they/them/themself -->
+  <pronounset
+      Subjective="they"
+      Objective="them"
+      PossessiveAdjective="their"
+      SubstantivePossessive="theirs"
+      Reflexive="themself"
+      />
+
+  <!-- one/one's/oneself -->
+  <pronounset
+      Subjective="one"
+      Objective="one"
+      PossessiveAdjective="one's"
+      SubstantivePossessive="one's"
+      Reflexive="oneself"
+      />
+
+  <!-- e/em/eir (Spivak) -->
+  <pronounset
+      Subjective="e"
+      Objective="em"
+      PossessiveAdjective="eir"
+      SubstantivePossessive="eirs"
+      Reflexive="emself"
+      />
+
+  <!-- thon/thons -->
+  <pronounset
+      Subjective="thon"
+      Objective="thon"
+      PossessiveAdjective="thons"
+      SubstantivePossessive="thon's"
+      Reflexive="thonself"
+      />
+</pronounsets>
