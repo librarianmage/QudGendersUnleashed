@@ -1,6 +1,8 @@
 using HarmonyLib;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 using XRL;
 using XRL.World;
 using XRL.CharacterBuilds.Qud.UI;
@@ -45,6 +47,16 @@ namespace QudGendersUnleashed.HarmonyPatches
             MethodInfo oldMethod = AccessTools.Method(typeof(PronounSet), nameof(PronounSet.GetAllGenericPersonal));
             MethodInfo newMethod = AccessTools.Method(typeof(PronounSet), nameof(PronounSet.GetAllPersonal));
             return HarmonyLib.Transpilers.MethodReplacer(instructions, oldMethod, newMethod);
+        }
+    }
+
+    [HarmonyPatch(typeof(GameObject))]
+    [HarmonyPatch(nameof(GameObject.GetPronounProvider))]
+    public static class NameOnlyPronounPatch
+    {
+        static IPronounProvider Postfix(IPronounProvider PronounSet)
+        {
+            return PronounSet;
         }
     }
 }
