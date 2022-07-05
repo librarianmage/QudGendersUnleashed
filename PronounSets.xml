@@ -52,4 +52,13 @@
       SubstantivePossessive="thon's"
       Reflexive="thonself"
       />
+
+  <!-- name -->
+  <pronounset
+      Subjective="=name="
+      Objective="=name="
+      PossessiveAdjective="=name's="
+      SubstantivePossessive="=name's="
+      Reflexive="=name="
+      />
 </pronounsets>

@@ -5,7 +5,7 @@ using XRL;
 using XRL.World;
 using XRL.CharacterBuilds.Qud.UI;
 
-namespace QudGendersUnleashed.HarmonyPatches
+namespace QudGendersUnleashed.PronounAndGenderSelectorPatches
 {
     [HarmonyPatch]
     public static class CharacterCreationGenderPatch
@@ -37,7 +37,8 @@ namespace QudGendersUnleashed.HarmonyPatches
         }
     }
 
-    [HarmonyPatch(typeof(PronounAndGenderSets),nameof(PronounAndGenderSets.ShowChangePronounSet))]
+    [HarmonyPatch(typeof(PronounAndGenderSets))]
+    [HarmonyPatch(nameof(PronounAndGenderSets.ShowChangePronounSet))]
     public static class PlaytimePronounPatch
     {
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
@@ -47,4 +48,8 @@ namespace QudGendersUnleashed.HarmonyPatches
             return HarmonyLib.Transpilers.MethodReplacer(instructions, oldMethod, newMethod);
         }
     }
+
+
+
+
 }
