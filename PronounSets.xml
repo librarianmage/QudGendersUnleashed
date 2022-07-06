@@ -60,5 +60,11 @@
       PossessiveAdjective="=name's="
       SubstantivePossessive="=name's="
       Reflexive="=name="
+      PersonTerm="=name="
+      ImmaturePersonTerm="=name="
+      FormalAddressTerm="=name="
+      OffspringTerm="=name="
+      SiblingTerm="=name="
+      ParentTerm="=name="
       />
 </pronounsets>
