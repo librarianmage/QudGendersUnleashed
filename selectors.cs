@@ -6,6 +6,7 @@ using XRL;
 using XRL.World;
 using XRL.CharacterBuilds.Qud.UI;
 using XRL.UI;
+using System.Threading.Tasks;
 
 namespace QudGendersUnleashed.PronounAndGenderSelectorPatches
 {
@@ -67,16 +68,30 @@ namespace QudGendersUnleashed.PronounAndGenderSelectorPatches
 
         public static void ChangePronounSet(GameObject Player)
         {
+            Task<PronounSet> newPronounTask = OnChoosePronounSetAsync(Player);
+            newPronounTask.Wait();
+            PronounSet newPronoun = newPronounTask.Result;
+
+            if (newPronoun != null)
+            {
+                Player.SetPronounSet(newPronoun.Register());
+            }
+        }
+
+        public static async Task<PronounSet> OnChoosePronounSetAsync(GameObject Player)
+        {
             List<PronounSet> availablePronounSets = PronounSet.GetAllPersonal();
+            IEnumerable<string> pronounNames = availablePronounSets.Select((PronounSet pronounSet) => pronounSet.Name);
+
             PronounSet currentPronounSet = Player.GetPronounSet();
-            int indexCurrentPronounSet = availablePronounSets.FindIndex(p => p.Name == currentPronounSet.Name);
+            int indexCurrentPronounSet = availablePronounSets.FindIndex(p => p == currentPronounSet);
 
             List<string> options = new List<string>();
             options.Add("<from gender>");
-            options.AddRange(availablePronounSets.Select((PronounSet pronounSet) => pronounSet.Name));
-            // options.Add("<create new>");
+            options.AddRange(pronounNames);
+            options.Add("<create new>");
 
-            var index = Popup.ShowOptionList(
+            int index = await Popup.AsyncShowOptionsList(
                 Title: "Change Pronoun Set",
                 Options: options.ToArray(),
                 AllowEscape: true,
@@ -84,30 +99,37 @@ namespace QudGendersUnleashed.PronounAndGenderSelectorPatches
 
             if (index > -1)
             {
-                // Option was selected
                 if (options[index] != "<create new>")
                 {
-                    // Option was not <create new>
-
-                    PronounSet selected;
                     if (index == 0)
                     {
+                        // Selected <from gender>
                         Gender playerGender = Player.GetGender();
-                        selected = new PronounSet(playerGender);
+                        return new PronounSet(playerGender);
                     }
                     else
                     {
-                        selected = availablePronounSets[index - 1];
+                        return availablePronounSets[index - 1];
                     }
-
-                    Player.SetPronounSet(selected.Register());
-
                 }
-                else
+
+                int basePronounIndex = await Popup.AsyncShowOptionsList(
+                    Title: "Select Base Set",
+                    Options: pronounNames.ToArray(),
+                    RespectOptionNewlines: false,
+                    AllowEscape: true);
+
+                if (basePronounIndex > -1)
                 {
-                    // Currently unimplemented because the current customization process uses async stuff and this is in the old UI
+                    PronounSet original = availablePronounSets[basePronounIndex];
+                    PronounSet newPronounSet = new PronounSet(original);
+                    if (await newPronounSet.CustomizeAsync())
+                    {
+                        return newPronounSet;
+                    }
                 }
             }
+            return null;
         }
     }
 }
