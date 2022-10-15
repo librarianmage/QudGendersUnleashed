@@ -19,9 +19,14 @@ namespace QudGendersUnleashed.PronounAndGenderSelectorPatches
         }
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            MethodInfo oldMethod = AccessTools.Method(typeof(Gender), nameof(Gender.GetAllGenericPersonalSingular));
+            MethodInfo oldPReefMethod = AccessTools.Method(typeof(Gender), nameof(Gender.GetAllGenericPersonalSingular));
+            MethodInfo oldMStairMethod = AccessTools.Method(typeof(Gender), nameof(Gender.GetAllGenericPersonal));
             MethodInfo newMethod = AccessTools.Method(typeof(Gender), nameof(Gender.GetAllPersonal));
-            return HarmonyLib.Transpilers.MethodReplacer(instructions, oldMethod, newMethod);
+
+            IEnumerable<CodeInstruction> replacePReef = HarmonyLib.Transpilers.MethodReplacer(instructions, oldPReefMethod, newMethod);
+            IEnumerable<CodeInstruction> replaceMStair = HarmonyLib.Transpilers.MethodReplacer(replacePReef, oldMStairMethod, newMethod);
+
+            return replaceMStair;
         }
     }
 
@@ -35,9 +40,14 @@ namespace QudGendersUnleashed.PronounAndGenderSelectorPatches
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
 
-            MethodInfo oldMethod = AccessTools.Method(typeof(PronounSet), nameof(PronounSet.GetAllGenericPersonalSingular));
+            MethodInfo oldPReefMethod = AccessTools.Method(typeof(PronounSet), nameof(PronounSet.GetAllGenericPersonalSingular));
+            MethodInfo oldMStairMethod = AccessTools.Method(typeof(PronounSet), nameof(PronounSet.GetAllGenericPersonal));
             MethodInfo newMethod = AccessTools.Method(typeof(PronounSet), nameof(PronounSet.GetAllPersonal));
-            return HarmonyLib.Transpilers.MethodReplacer(instructions, oldMethod, newMethod);
+
+            IEnumerable<CodeInstruction> replacePReef = HarmonyLib.Transpilers.MethodReplacer(instructions, oldPReefMethod, newMethod);
+            IEnumerable<CodeInstruction> replaceMStair = HarmonyLib.Transpilers.MethodReplacer(replacePReef, oldMStairMethod, newMethod);
+
+            return replaceMStair;
         }
     }
 
