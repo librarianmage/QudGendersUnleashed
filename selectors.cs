@@ -101,11 +101,11 @@ namespace QudGendersUnleashed.PronounAndGenderSelectorPatches
             options.AddRange(pronounNames);
             options.Add("<create new>");
 
-            int index = await Popup.AsyncShowOptionsList(
+            int index = await Popup.ShowOptionListAsync(
                 Title: "Change Pronoun Set",
                 Options: options.ToArray(),
                 AllowEscape: true,
-                defaultSelected: indexCurrentPronounSet + 1);
+                DefaultSelected: indexCurrentPronounSet + 1);
 
             if (index > -1)
             {
@@ -123,7 +123,7 @@ namespace QudGendersUnleashed.PronounAndGenderSelectorPatches
                     }
                 }
 
-                int basePronounIndex = await Popup.AsyncShowOptionsList(
+                int basePronounIndex = await Popup.ShowOptionListAsync(
                     Title: "Select Base Set",
                     Options: pronounNames.ToArray(),
                     RespectOptionNewlines: false,
