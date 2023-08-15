@@ -5,42 +5,92 @@ using ConsoleLib.Console;
 
 namespace QudGendersUnleashed.NamePronoun
 {
+    /// <summary>
+    ///   Wraps the <see cref="IPronounProvider"/> returned by <see cref="GameObject.GetPronounProvider"/> with a <see cref="NamePronounWrapper" />.
+    /// </summary>
     [HarmonyPatch(typeof(GameObject))]
     [HarmonyPatch(nameof(GameObject.GetPronounProvider))]
     public static class NameOnlyPronounPatch
     {
-        static IPronounProvider Postfix(IPronounProvider PronounSet, GameObject __instance)
-        {
-            return new NamePronounWrapper(PronounSet, __instance);
-        }
+        static IPronounProvider Postfix(IPronounProvider pronouns, GameObject __instance)
+            => NamePronounWrapper.Wrap(pronouns, __instance);
     }
 
-    // Wraps a IPronounProvider to replace =name=/=name's= with the holder's name
+    /// <summary>
+    ///   Wraps a <see cref="IPronounProvider"/>, replacing <c>=name=</c>/<c>=name's=</c> with the name of the pronouns' referent.
+    /// </summary>
     public class NamePronounWrapper : IPronounProvider
     {
         private IPronounProvider BasePronouns;
-        private GameObject Referrant;
+        private GameObject Referent;
 
-        public NamePronounWrapper(IPronounProvider BasePronouns, GameObject Referrant)
+        private static bool CouldHaveName(string s) => s.Contains("=name");
+
+        public static bool CouldBeNamePronouns(IPronounProvider pronouns) =>
+            CouldHaveName(pronouns.Name)
+            || CouldHaveName(pronouns.CapitalizedName)
+            || CouldHaveName(pronouns.Subjective)
+            || CouldHaveName(pronouns.CapitalizedSubjective)
+            || CouldHaveName(pronouns.Objective)
+            || CouldHaveName(pronouns.CapitalizedObjective)
+            || CouldHaveName(pronouns.PossessiveAdjective)
+            || CouldHaveName(pronouns.CapitalizedPossessiveAdjective)
+            || CouldHaveName(pronouns.SubstantivePossessive)
+            || CouldHaveName(pronouns.CapitalizedSubstantivePossessive)
+            || CouldHaveName(pronouns.Reflexive)
+            || CouldHaveName(pronouns.CapitalizedReflexive)
+            || CouldHaveName(pronouns.PersonTerm)
+            || CouldHaveName(pronouns.CapitalizedPersonTerm)
+            || CouldHaveName(pronouns.ImmaturePersonTerm)
+            || CouldHaveName(pronouns.CapitalizedImmaturePersonTerm)
+            || CouldHaveName(pronouns.FormalAddressTerm)
+            || CouldHaveName(pronouns.CapitalizedFormalAddressTerm)
+            || CouldHaveName(pronouns.OffspringTerm)
+            || CouldHaveName(pronouns.CapitalizedOffspringTerm)
+            || CouldHaveName(pronouns.SiblingTerm)
+            || CouldHaveName(pronouns.CapitalizedSiblingTerm)
+            || CouldHaveName(pronouns.ParentTerm)
+            || CouldHaveName(pronouns.CapitalizedParentTerm)
+            || CouldHaveName(pronouns.IndicativeProximal)
+            || CouldHaveName(pronouns.CapitalizedIndicativeProximal)
+            || CouldHaveName(pronouns.IndicativeDistal)
+            || CouldHaveName(pronouns.CapitalizedIndicativeDistal);
+
+        public static IPronounProvider Wrap(IPronounProvider basePronouns, GameObject referent)
         {
-            this.BasePronouns = BasePronouns;
-            this.Referrant = Referrant;
-            // Consider: caching if replacing is needed
+            if (basePronouns is NamePronounWrapper p && p.Referent != referent)
+            {
+                p.Referent = referent;
+            }
+            else if (CouldBeNamePronouns(basePronouns))
+            {
+                return new NamePronounWrapper(basePronouns, referent);
+            }
+
+            return basePronouns;
         }
 
-        string ReplaceWithName(string Pronoun, bool capitalize = false)
+        public NamePronounWrapper(IPronounProvider basePronouns, GameObject referent)
         {
-            if (Pronoun.Contains("=name"))
+            this.BasePronouns = basePronouns;
+            this.Referent = referent;
+        }
+
+        public string ReplaceWithName(string pronoun, bool capitalize = false)
+        {
+            if (pronoun.Contains("=name"))
             {
-                string DisplayName = Referrant.BaseDisplayNameStripped;
-                if (capitalize) { DisplayName = ColorUtility.CapitalizeExceptFormatting(DisplayName); }
-                string DisplayNamePosessive = Grammar.MakePossessive(DisplayName);
-                return Pronoun.Replace("=name=", DisplayName)
-                    .Replace("=name's=", DisplayNamePosessive);
+                string displayName = Referent.BaseDisplayNameStripped;
+                if (capitalize) {
+                    displayName = ColorUtility.CapitalizeExceptFormatting(displayName);
+                }
+                string displayNamePossessive = Grammar.MakePossessive(displayName);
+                return pronoun.Replace("=name=", displayName)
+                    .Replace("=name's=", displayNamePossessive);
             }
             else
             {
-                return Pronoun;
+                return pronoun;
             }
         }
 
@@ -76,7 +126,6 @@ namespace QudGendersUnleashed.NamePronoun
 
         public string CapitalizedReflexive => ReplaceWithName(BasePronouns.CapitalizedReflexive, true);
 
-        // Consider: The methods below here are unlikely to contain =name=/=name's=, remove wrap?
         public string PersonTerm => ReplaceWithName(BasePronouns.PersonTerm);
 
         public string CapitalizedPersonTerm => ReplaceWithName(BasePronouns.CapitalizedPersonTerm, true);
