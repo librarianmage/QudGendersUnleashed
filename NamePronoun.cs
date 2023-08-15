@@ -12,10 +12,8 @@ namespace QudGendersUnleashed.NamePronoun
     [HarmonyPatch(nameof(GameObject.GetPronounProvider))]
     public static class NameOnlyPronounPatch
     {
-        static IPronounProvider Postfix(IPronounProvider PronounSet, GameObject __instance)
-        {
-            return NamePronounWrapper.Wrap(PronounSet, __instance);
-        }
+        static IPronounProvider Postfix(IPronounProvider pronouns, GameObject __instance)
+            => NamePronounWrapper.Wrap(pronouns, __instance);
     }
 
     /// <summary>
@@ -26,73 +24,73 @@ namespace QudGendersUnleashed.NamePronoun
         private IPronounProvider BasePronouns;
         private GameObject Referent;
 
-        private static bool CouldHaveName(string S) => S.Contains("=name");
+        private static bool CouldHaveName(string s) => s.Contains("=name");
 
-        public static bool CouldBeNamePronouns(IPronounProvider Pronouns) =>
-            CouldHaveName(Pronouns.Name)
-            || CouldHaveName(Pronouns.CapitalizedName)
-            || CouldHaveName(Pronouns.Subjective)
-            || CouldHaveName(Pronouns.CapitalizedSubjective)
-            || CouldHaveName(Pronouns.Objective)
-            || CouldHaveName(Pronouns.CapitalizedObjective)
-            || CouldHaveName(Pronouns.PossessiveAdjective)
-            || CouldHaveName(Pronouns.CapitalizedPossessiveAdjective)
-            || CouldHaveName(Pronouns.SubstantivePossessive)
-            || CouldHaveName(Pronouns.CapitalizedSubstantivePossessive)
-            || CouldHaveName(Pronouns.Reflexive)
-            || CouldHaveName(Pronouns.CapitalizedReflexive)
-            || CouldHaveName(Pronouns.PersonTerm)
-            || CouldHaveName(Pronouns.CapitalizedPersonTerm)
-            || CouldHaveName(Pronouns.ImmaturePersonTerm)
-            || CouldHaveName(Pronouns.CapitalizedImmaturePersonTerm)
-            || CouldHaveName(Pronouns.FormalAddressTerm)
-            || CouldHaveName(Pronouns.CapitalizedFormalAddressTerm)
-            || CouldHaveName(Pronouns.OffspringTerm)
-            || CouldHaveName(Pronouns.CapitalizedOffspringTerm)
-            || CouldHaveName(Pronouns.SiblingTerm)
-            || CouldHaveName(Pronouns.CapitalizedSiblingTerm)
-            || CouldHaveName(Pronouns.ParentTerm)
-            || CouldHaveName(Pronouns.CapitalizedParentTerm)
-            || CouldHaveName(Pronouns.IndicativeProximal)
-            || CouldHaveName(Pronouns.CapitalizedIndicativeProximal)
-            || CouldHaveName(Pronouns.IndicativeDistal)
-            || CouldHaveName(Pronouns.CapitalizedIndicativeDistal);
+        public static bool CouldBeNamePronouns(IPronounProvider pronouns) =>
+            CouldHaveName(pronouns.Name)
+            || CouldHaveName(pronouns.CapitalizedName)
+            || CouldHaveName(pronouns.Subjective)
+            || CouldHaveName(pronouns.CapitalizedSubjective)
+            || CouldHaveName(pronouns.Objective)
+            || CouldHaveName(pronouns.CapitalizedObjective)
+            || CouldHaveName(pronouns.PossessiveAdjective)
+            || CouldHaveName(pronouns.CapitalizedPossessiveAdjective)
+            || CouldHaveName(pronouns.SubstantivePossessive)
+            || CouldHaveName(pronouns.CapitalizedSubstantivePossessive)
+            || CouldHaveName(pronouns.Reflexive)
+            || CouldHaveName(pronouns.CapitalizedReflexive)
+            || CouldHaveName(pronouns.PersonTerm)
+            || CouldHaveName(pronouns.CapitalizedPersonTerm)
+            || CouldHaveName(pronouns.ImmaturePersonTerm)
+            || CouldHaveName(pronouns.CapitalizedImmaturePersonTerm)
+            || CouldHaveName(pronouns.FormalAddressTerm)
+            || CouldHaveName(pronouns.CapitalizedFormalAddressTerm)
+            || CouldHaveName(pronouns.OffspringTerm)
+            || CouldHaveName(pronouns.CapitalizedOffspringTerm)
+            || CouldHaveName(pronouns.SiblingTerm)
+            || CouldHaveName(pronouns.CapitalizedSiblingTerm)
+            || CouldHaveName(pronouns.ParentTerm)
+            || CouldHaveName(pronouns.CapitalizedParentTerm)
+            || CouldHaveName(pronouns.IndicativeProximal)
+            || CouldHaveName(pronouns.CapitalizedIndicativeProximal)
+            || CouldHaveName(pronouns.IndicativeDistal)
+            || CouldHaveName(pronouns.CapitalizedIndicativeDistal);
 
-        public static IPronounProvider Wrap(IPronounProvider BasePronouns, GameObject Referent)
+        public static IPronounProvider Wrap(IPronounProvider basePronouns, GameObject referent)
         {
-            if (BasePronouns is NamePronounWrapper p && p.Referent != Referent)
+            if (basePronouns is NamePronounWrapper p && p.Referent != referent)
             {
-                p.Referent = Referent;
+                p.Referent = referent;
             }
-            else if (CouldBeNamePronouns(BasePronouns))
+            else if (CouldBeNamePronouns(basePronouns))
             {
-                return new NamePronounWrapper(BasePronouns, Referent);
+                return new NamePronounWrapper(basePronouns, referent);
             }
 
-            return BasePronouns;
+            return basePronouns;
         }
 
-        public NamePronounWrapper(IPronounProvider BasePronouns, GameObject Referrant)
+        public NamePronounWrapper(IPronounProvider basePronouns, GameObject referent)
         {
-            this.BasePronouns = BasePronouns;
-            this.Referent = Referrant;
+            this.BasePronouns = basePronouns;
+            this.Referent = referent;
         }
 
-        public string ReplaceWithName(string Pronoun, bool capitalize = false)
+        public string ReplaceWithName(string pronoun, bool capitalize = false)
         {
-            if (Pronoun.Contains("=name"))
+            if (pronoun.Contains("=name"))
             {
-                string DisplayName = Referent.BaseDisplayNameStripped;
+                string displayName = Referent.BaseDisplayNameStripped;
                 if (capitalize) {
-                    DisplayName = ColorUtility.CapitalizeExceptFormatting(DisplayName);
+                    displayName = ColorUtility.CapitalizeExceptFormatting(displayName);
                 }
-                string DisplayNamePosessive = Grammar.MakePossessive(DisplayName);
-                return Pronoun.Replace("=name=", DisplayName)
-                    .Replace("=name's=", DisplayNamePosessive);
+                string displayNamePossessive = Grammar.MakePossessive(displayName);
+                return pronoun.Replace("=name=", displayName)
+                    .Replace("=name's=", displayNamePossessive);
             }
             else
             {
-                return Pronoun;
+                return pronoun;
             }
         }
 

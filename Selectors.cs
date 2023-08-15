@@ -7,8 +7,11 @@ using XRL.CharacterBuilds.Qud.UI;
 using XRL.UI;
 using XRL.World;
 
-namespace QudGendersUnleashed.Selectors
+// TODO: refactor
+
+namespace QudGendersUnleashed
 {
+    /// <summary>Selectors for gender and pronoun sets.</summary>
     [HasModSensitiveStaticCache]
     public static class Selectors
     {
@@ -28,8 +31,8 @@ namespace QudGendersUnleashed.Selectors
                     foreach (Gender g in suspects)
                     {
                         var setName = new PronounSet(g).Name;
-                        var pronounSet = PronounSet.GetIfExists(setName);
-                        if (pronounSet != null) _PronounGenderMapping.Add(pronounSet, g);
+                        var set = PronounSet.GetIfExists(setName);
+                        if (set != null) _PronounGenderMapping.Add(set, g);
                     }
 
                 }
@@ -98,75 +101,89 @@ namespace QudGendersUnleashed.Selectors
             var initial = availableGenders.IndexOf(current);
             if (initial < 0) initial = 0;
 
-            int n = await Popup.ShowOptionListAsync("Choose Gender", options.ToArray(), AllowEscape: true, DefaultSelected: initial);
+            int index = await Popup.ShowOptionListAsync(
+                Title: "Choose Gender",
+                Options: options.ToArray(),
+                AllowEscape: true,
+                DefaultSelected: initial
+            );
 
-            if (n <= -1) return null;
-            else if (n == options.Count - 1)
+            if (index <= -1)
+                return null;
+            else if (0 <= index && index < options.Count - 1)
+                return availableGenders[index];
+            else
             {
-                int b = await Popup.ShowOptionListAsync("Select Base Gender", availableGenders.Select(PronounSet => PronounSet.Name).ToArray(), AllowEscape: true, DefaultSelected: initial);
-                    if( b > -1 )
-                    {
-                        var baseGender = availableGenders[b];
-                        var newGender = new Gender(baseGender);
-                        bool ok = await newGender.CustomizeAsync();
-                        if( ok ) return newGender;
-                    }
-            }
-            else return availableGenders[n];
+                int baseIndex = await Popup.ShowOptionListAsync(
+                    Title: "Select Base Gender",
+                    Options: availableGenders.Select(gender => gender.Name).ToArray(),
+                    AllowEscape: true,
+                    DefaultSelected: initial
+                );
 
-            return null;
+                if (baseIndex <= -1) return null;
+
+                var baseGender = availableGenders[baseIndex];
+                var newGender = new Gender(baseGender);
+
+                if(await newGender.CustomizeAsync())
+                    return newGender;
+                else
+                    return null;
+            }
         }
 
         public static async Task<Gender> OnChooseGenderAsync(QudCustomizeCharacterModuleWindow window)
-        {
-            return await ChooseGenderAsync(window?.module?.data?.gender);
-        }
+            => await ChooseGenderAsync(window?.module?.data?.gender);
 
         public static void ChooseGender()
         {
             var newGender = ChooseGenderAsync(The.Player.GetGender()).Result;
-
             The.Player.SetGender(newGender.Register());
         }
 
         public static async Task<PronounSet> ChoosePronounSetAsync(Gender currentGender, PronounSet currentPronounSet, PronounSet placeholder)
         {
             var availablePronounSets = PronounSet.GetAllPersonal();
-
             var options =  new List<string>();
             options.Add(FormatFromGenderPronounOption(currentGender));
-            options.AddRange( availablePronounSets.Select(pronounSet => FormatPronounSet(pronounSet)));
-
+            options.AddRange(availablePronounSets.Select(pronounSet => FormatPronounSet(pronounSet)));
             options.Add(CreateNewText);
 
-            var PSpos = availablePronounSets.IndexOf(currentPronounSet);
-            var initialPos = PSpos + 1;
-            var newPos = PSpos;
-            if (newPos < 0) newPos = 0;
+            int initialPos, newPos;
+            if (currentPronounSet == null)
+            {
+                initialPos = 0;
+                newPos = 0;
+            }
+            else
+            {
+                int setIndex = availablePronounSets.IndexOf(currentPronounSet);
+
+                initialPos = setIndex + 1;
+                newPos = setIndex;
+                if (newPos < 0) newPos = 0;
+            }
 
             int n = await Popup.ShowOptionListAsync("Choose Pronoun Set", options.ToArray(), AllowEscape: true, DefaultSelected: initialPos);
 
-            if( n > -1 )
+            if (n <= -1)
+                return null;
+            else if (n == 0)
+                return placeholder;
+            else if (1 <= n && n < options.Count - 1)
+                return availablePronounSets[n];
+            else
             {
-                if( n == options.Count-1 )
-                {
-                    int b = await Popup.ShowOptionListAsync("Select Base Set", availablePronounSets.Select(PronounSet => PronounSet.Name).ToArray(), AllowEscape: true, DefaultSelected: newPos);
-                    if( b > -1 )
-                    {
-                        var basePronounSet = availablePronounSets[b];
-                        var newPronounSet = new PronounSet(basePronounSet);
-                        bool ok = await newPronounSet.CustomizeAsync();
-                        if( ok ) return newPronounSet;
-                    }
-                }
-                else
-                {
-                    if( n == 0 ) return placeholder;
-                    return availablePronounSets[n-1];
-                }
-            }
+                int b = await Popup.ShowOptionListAsync("Select Base Set", availablePronounSets.Select(PronounSet => PronounSet.Name).ToArray(), AllowEscape: true, DefaultSelected: newPos);
+                if (b <= -1) return null;
 
-            return null;
+                var basePronounSet = availablePronounSets[b];
+                var newPronounSet = new PronounSet(basePronounSet);
+
+                if( await newPronounSet.CustomizeAsync() ) return newPronounSet;
+                else return null;
+            }
         }
 
         public static async Task<PronounSet> OnChoosePronounSetAsync(QudCustomizeCharacterModuleWindow window, PronounSet fromGenderPlaceholder)

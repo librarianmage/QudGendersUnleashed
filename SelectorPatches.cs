@@ -4,8 +4,9 @@ using XRL.World;
 using XRL.CharacterBuilds.Qud.UI;
 using System.Threading.Tasks;
 
-namespace QudGendersUnleashed.Selectors.Patches
+namespace QudGendersUnleashed.Patches
 {
+    /// <summary>Patch the gender selector during character creation.</summary>
     [HarmonyPatch(typeof(QudCustomizeCharacterModuleWindow))]
     [HarmonyPatch(nameof(QudCustomizeCharacterModuleWindow.OnChooseGenderAsync))]
     public static class GenderPatch
@@ -15,6 +16,7 @@ namespace QudGendersUnleashed.Selectors.Patches
         static Task<Gender> Postfix(Task<Gender> _, QudCustomizeCharacterModuleWindow __instance) => Selectors.OnChooseGenderAsync(__instance);
     }
 
+    /// <summary>Patch the pronoun set selector during character creation.</summary>
     [HarmonyPatch(typeof(QudCustomizeCharacterModuleWindow))]
     [HarmonyPatch(nameof(QudCustomizeCharacterModuleWindow.OnChoosePronounSetAsync))]
     public static class PronounPatch
@@ -25,6 +27,7 @@ namespace QudGendersUnleashed.Selectors.Patches
             => Selectors.OnChoosePronounSetAsync(__instance, ___fromGenderPlaceholder);
     }
 
+    /// <summary>Patch the pronoun set selector from the character sheet.</summary>
     [HarmonyPatch(typeof(PronounAndGenderSets))]
     [HarmonyPatch(nameof(PronounAndGenderSets.ShowChangePronounSet))]
     public static class PlaytimePronounPatch
