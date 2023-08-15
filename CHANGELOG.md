@@ -4,11 +4,14 @@
 Tested to work on game versions 204.100 / 205.54 (beta)
 
 * Fix error preventing loading
+* Reduce `NamePronounWrapper` wrapping
 
 Meta:
 
 * Add `CHANGELOG.md`
 * Update icon
+* Update mod description
+* Update `LICENSE`
 
 ## v1.4 — 2022-10-15
 Tested to work on game version 203.54 and the Moon Stair alpha

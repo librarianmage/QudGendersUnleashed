@@ -1,8 +1,9 @@
 {
-    "id": "QudGendersUnleashed",
-    "title": "{{m-Y-g alternation|Qud: Genders Unleashed}}",
-    "description": "Adds gendeers and pronounce",
-    "version": "1.4",
-    "author": "librarianmage",
-    "previewImage": "Assets/icon.png"
+  "id": "QudGendersUnleashed",
+  "title": "{{m-Y-g alternation|Qud: Genders Unleashed}}",
+  "description": "Adds gendeers and pronounce",
+  "tags": "Gender,Pronouns",
+  "version": "1.4",
+  "author": "{{R|librarianmage}}",
+  "previewImage": "Assets/icon.png"
 }
