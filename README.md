@@ -4,13 +4,15 @@ A mod that works in conjunction with the [Gender and Pronoun Sets](https://steam
 
 Specifically, this mod allows you to pick from all personal genders and pronouns defined in game (including pseudo-plural ones), with a number of additions.
 
-Additionally, the "choose pronoun" prompt in game has been modified to use the modern UI. This will facilitate picking from the extended list this mod provides.
+Additionally, all gender and pronoun prompts have been redesigned with inspirations from kernelmethod's [Better Pet Selector](https://steamcommunity.com/sharedfiles/filedetails/?id=3006503292) mod.
 
 Tested to work on game versions 204.100 / 205.54 (beta).
 
 [Source Code (GitHub)](https://github.com/librarianmage/QudGendersUnleashed) \| [Workshop Page](https://steamcommunity.com/sharedfiles/filedetails/?id=2815078000) \| [My Caves of Qud Mods (Steam Workshop)](https://steamcommunity.com/profiles/76561198836298826/myworkshopfiles/?appid=333640)
 
-Also check out the [Pride Naming Colors](https://steamcommunity.com/sharedfiles/filedetails/?id=2951409991) Workshop mod by Steam user Flaborized!
+## Wishes
+
+The wishes `changegender` and `changepronouns` have been added for quick access while playing.
 
 ## `=name=` Pronoun Sets
 
