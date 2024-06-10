@@ -77,7 +77,11 @@ namespace QudGendersUnleashed
         public static void ChooseGender()
         {
             var newGender = ChooseGenderAsync(The.Player.GetGender()).Result;
-            The.Player.SetGender(newGender.Register());
+            if (newGender is not null)
+            {
+                The.Player.SetGender(newGender.Register());
+                Popup.Show("Set gender to {newGender.Name}");
+            }
         }
 
         public static async Task<PronounSet> ChoosePronounSetAsync(
@@ -98,7 +102,7 @@ namespace QudGendersUnleashed
 
             int initialPos,
                 newPos;
-            if (currentPronounSet == null)
+            if (currentPronounSet is null)
             {
                 initialPos = 0;
                 newPos = 0;
@@ -186,10 +190,12 @@ namespace QudGendersUnleashed
             {
                 var n = new PronounSet(The.Player.GetGender());
                 The.Player.SetPronounSet(n);
+                Popup.Show($"set pronoun set from gender ({n.Name})", LogMessage: false);
             }
             else if (newPronounSet != null)
             {
                 The.Player.SetPronounSet(newPronounSet.Register());
+                Popup.Show($"set pronoun set to {newPronounSet.Name}", LogMessage: false);
             }
         }
     }
