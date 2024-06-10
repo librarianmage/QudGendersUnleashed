@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using ConsoleLib.Console;
 using XRL.World;
@@ -10,25 +9,25 @@ namespace QudGendersUnleashed
         public static readonly string FromGenderText = Markup.Color("W", "<from gender>");
         public static readonly string CreateNewText = Markup.Color("W", "<create new>");
 
-        public static string FormatGender(Gender g)
+        public static string FormatGender(Gender G)
         {
-            var name = Markup.Color("M", g.Name);
-            var summary = Markup.Color("c", g.GetBasicSummary());
+            var name = Markup.Color("M", G.Name);
+            var summary = Markup.Color("c", G.GetBasicSummary());
 
             return $"{name}\n{summary}";
         }
 
-        public static string FormatPronounSet(PronounSet p)
+        public static string FormatPronounSet(PronounSet P)
         {
-            var name = Markup.Color("M", p.GetShortName());
-            var summary = Markup.Color("c", p.GetBasicSummary());
+            var name = Markup.Color("M", P.GetShortName());
+            var summary = Markup.Color("c", P.GetBasicSummary());
 
-            if (p.FromGender)
+            if (P.FromGender)
             {
                 var suspects = Gender
-                    .Find(g => !g.DoNotReplicateAsPronounSet)
-                    .Where(g => new PronounSet(g).Name == p.Name)
-                    .Select(g => Markup.Color("m", g.Name));
+                    .Find(G => !G.DoNotReplicateAsPronounSet)
+                    .Where(G => new PronounSet(G).Name == P.Name)
+                    .Select(G => Markup.Color("m", G.Name));
 
                 var from = suspects.Any() ? string.Join(" / ", suspects) : "unknown";
                 var extra = Markup.Color("m", $"(from {from})");
@@ -39,9 +38,9 @@ namespace QudGendersUnleashed
             return $"{name}\n{summary}";
         }
 
-        public static string FormatFromGenderPronounOption(Gender g)
+        public static string FormatFromGenderPronounOption(Gender G)
         {
-            var g1 = g ?? Gender.Get("nonspecific");
+            var g1 = G ?? Gender.Get("nonspecific");
             if (g1 is null)
             {
                 return FromGenderText;

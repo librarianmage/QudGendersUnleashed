@@ -2,61 +2,57 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using XRL;
-using XRL.CharacterBuilds.Qud.UI;
 using XRL.UI;
 using XRL.World;
-
-// TODO: refactor
 
 namespace QudGendersUnleashed
 {
     /// <summary>Selectors for gender and pronoun sets.</summary>
     public static class Selectors
     {
-        public static async Task<Gender> ChooseGenderAsync(Gender current)
+        #region Genders
+        public static async Task<Gender> SelectGenderAsync(Gender CurrentGender)
         {
-            var availableGenders = Gender.GetAllPersonal();
-            var options = availableGenders
-                .Select(gender => Formatting.FormatGender(gender))
-                .ToList();
+            var genders = Gender.GetAllPersonal();
+            var options = genders.Select(G => Formatting.FormatGender(G)).ToList();
             options.Add(Formatting.CreateNewText);
 
-            var initial = availableGenders.IndexOf(current);
-            if (initial < 0)
+            var initialSelection = genders.IndexOf(CurrentGender);
+            if (initialSelection < 0)
             {
-                initial = 0;
+                initialSelection = 0;
             }
 
-            var index = await Popup.ShowOptionListAsync(
+            var idx = await Popup.ShowOptionListAsync(
                 Title: "Choose Gender",
                 Options: options.ToArray(),
                 AllowEscape: true,
-                DefaultSelected: initial
+                DefaultSelected: initialSelection
             );
 
-            if (index <= -1)
+            if (idx <= -1)
             {
                 return null;
             }
-            else if (0 <= index && index < options.Count - 1)
+            else if (0 <= idx && idx < options.Count - 1)
             {
-                return availableGenders[index];
+                return genders[idx];
             }
             else
             {
-                var baseIndex = await Popup.ShowOptionListAsync(
+                var baseIdx = await Popup.ShowOptionListAsync(
                     Title: "Select Base Gender",
-                    Options: availableGenders.Select(gender => gender.Name).ToArray(),
+                    Options: genders.Select(G => G.Name).ToArray(),
                     AllowEscape: true,
-                    DefaultSelected: initial
+                    DefaultSelected: initialSelection
                 );
 
-                if (baseIndex <= -1)
+                if (baseIdx <= -1)
                 {
                     return null;
                 }
 
-                var baseGender = availableGenders[baseIndex];
+                var baseGender = genders[baseIdx];
                 var newGender = new Gender(baseGender);
 
                 if (await newGender.CustomizeAsync())
@@ -70,52 +66,55 @@ namespace QudGendersUnleashed
             }
         }
 
-        public static async Task<Gender> OnChooseGenderAsync(
-            QudCustomizeCharacterModuleWindow window
-        ) => await ChooseGenderAsync(window?.module?.data?.gender);
-
-        public static void ChooseGender()
+        public static void ChooseGender(bool Message = false)
         {
-            var newGender = ChooseGenderAsync(The.Player.GetGender()).Result;
+            var newGender = SelectGenderAsync(The.Player.GetGender()).Result;
             if (newGender is not null)
             {
                 The.Player.SetGender(newGender.Register());
-                Popup.Show("Set gender to {newGender.Name}");
+                if (Message)
+                {
+                    Popup.Show($"Set gender to {newGender.Name}");
+                }
             }
         }
+        #endregion
 
+        #region Pronouns
         public static async Task<PronounSet> ChoosePronounSetAsync(
-            Gender currentGender,
-            PronounSet currentPronounSet,
-            PronounSet placeholder
+            Gender CurrentGender,
+            PronounSet CurrentPronounSet,
+            PronounSet Placeholder
         )
         {
-            var availablePronounSets = PronounSet.GetAllPersonal();
+            var pronounSets = PronounSet.GetAllPersonal();
             var options = new List<string>
             {
-                Formatting.FormatFromGenderPronounOption(currentGender)
+                Formatting.FormatFromGenderPronounOption(CurrentGender)
             };
-            options.AddRange(
-                availablePronounSets.Select(pronounSet => Formatting.FormatPronounSet(pronounSet))
-            );
+            options.AddRange(pronounSets.Select(P => Formatting.FormatPronounSet(P)));
             options.Add(Formatting.CreateNewText);
 
-            int initialPos,
-                newPos;
-            if (currentPronounSet is null)
+            int initialSelection,
+                newSelection;
+            if (CurrentPronounSet is null)
             {
-                initialPos = 0;
-                newPos = 0;
+                initialSelection = 0;
+                newSelection = 0;
             }
             else
             {
-                var setIndex = availablePronounSets.IndexOf(currentPronounSet);
+                var setIdx = pronounSets.IndexOf(CurrentPronounSet);
 
-                initialPos = setIndex + 1;
-                newPos = setIndex;
-                if (newPos < 0)
+                if (setIdx < 0)
                 {
-                    newPos = 0;
+                    initialSelection = 0;
+                    newSelection = 0;
+                }
+                else
+                {
+                    initialSelection = setIdx + 1;
+                    newSelection = setIdx;
                 }
             }
 
@@ -123,7 +122,7 @@ namespace QudGendersUnleashed
                 "Choose Pronoun Set",
                 options.ToArray(),
                 AllowEscape: true,
-                DefaultSelected: initialPos
+                DefaultSelected: initialSelection
             );
 
             if (n <= -1)
@@ -132,26 +131,26 @@ namespace QudGendersUnleashed
             }
             else if (n == 0)
             {
-                return placeholder;
+                return Placeholder;
             }
             else if (1 <= n && n < options.Count - 1)
             {
-                return availablePronounSets[n - 1];
+                return pronounSets[n - 1];
             }
             else
             {
                 var b = await Popup.ShowOptionListAsync(
                     "Select Base Set",
-                    availablePronounSets.Select(PronounSet => PronounSet.Name).ToArray(),
+                    pronounSets.Select(P => P.Name).ToArray(),
                     AllowEscape: true,
-                    DefaultSelected: newPos
+                    DefaultSelected: newSelection
                 );
                 if (b <= -1)
                 {
                     return null;
                 }
 
-                var basePronounSet = availablePronounSets[b];
+                var basePronounSet = pronounSets[b];
                 var newPronounSet = new PronounSet(basePronounSet);
 
                 if (await newPronounSet.CustomizeAsync())
@@ -165,20 +164,7 @@ namespace QudGendersUnleashed
             }
         }
 
-        public static async Task<PronounSet> OnChoosePronounSetAsync(
-            QudCustomizeCharacterModuleWindow window,
-            PronounSet fromGenderPlaceholder
-        )
-        {
-            var data = window?.module?.data;
-            return await ChoosePronounSetAsync(
-                data?.gender,
-                data?.pronounSet,
-                fromGenderPlaceholder
-            );
-        }
-
-        public static void ChoosePronounSet()
+        public static void ChoosePronounSet(bool Message = false)
         {
             var sentinel = new PronounSet();
             var newPronounSet = ChoosePronounSetAsync(
@@ -188,15 +174,22 @@ namespace QudGendersUnleashed
             ).Result;
             if (newPronounSet == sentinel)
             {
-                var n = new PronounSet(The.Player.GetGender());
-                The.Player.SetPronounSet(n);
-                Popup.Show($"set pronoun set from gender ({n.Name})", LogMessage: false);
+                var set = new PronounSet(The.Player.GetGender());
+                The.Player.SetPronounSet(set);
+                if (Message)
+                {
+                    Popup.Show($"set pronoun set from gender ({The.Player.GetGender().Name})", LogMessage: false);
+                }
             }
-            else if (newPronounSet != null)
+            else if (newPronounSet is not null)
             {
                 The.Player.SetPronounSet(newPronounSet.Register());
-                Popup.Show($"set pronoun set to {newPronounSet.Name}", LogMessage: false);
+                if (Message)
+                {
+                    Popup.Show($"set pronoun set to {newPronounSet.Name}", LogMessage: false);
+                }
             }
         }
+        #endregion
     }
 }

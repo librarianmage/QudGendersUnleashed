@@ -10,11 +10,11 @@ namespace QudGendersUnleashed
         /// <summary>Changes the user's gender.</summary>
         /// <remarks>Will not change the user's pronouns.</remarks>
         [WishCommand(Command = "changegender")]
-        public static void ChangeGender() => Selectors.ChooseGender();
+        public static void ChangeGender() => Selectors.ChooseGender(true);
 
         /// <summary>Changes the user's pronouns.</summary>
         [WishCommand(Command = "changepronouns")]
-        public static void ChangePronounSet() => Selectors.ChoosePronounSet();
+        public static void ChangePronounSet() => Selectors.ChoosePronounSet(true);
 
         /// <summary>Useless wish used to generate the header image.</summary>
         /// <seealso href="https://web.archive.org/web/20220311192738/https://twitter.com/chordbug/status/1188086928731713539"/>

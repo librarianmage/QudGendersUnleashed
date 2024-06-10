@@ -17,7 +17,7 @@ namespace QudGendersUnleashed.Patches
             QudCustomizeCharacterModuleWindow __instance
         )
         {
-            __result = Selectors.OnChooseGenderAsync(__instance);
+            __result = Selectors.SelectGenderAsync(__instance.module?.data?.gender);
             return false;
         }
     }
@@ -36,7 +36,14 @@ namespace QudGendersUnleashed.Patches
                 .Create(__instance)
                 .Field<PronounSet>("fromGenderPlaceholder")
                 .Value;
-            __result = Selectors.OnChoosePronounSetAsync(__instance, fromGenderPlaceholder);
+
+            var data = __instance.module?.data;
+
+            __result = Selectors.ChoosePronounSetAsync(
+                data?.gender,
+                data?.pronounSet,
+                fromGenderPlaceholder
+            );
             return false;
         }
     }
@@ -60,7 +67,7 @@ namespace QudGendersUnleashed.Patches
     [HarmonyPatch(nameof(GameObject.GetPronounProvider))]
     public static class NameOnlyPronounPatch
     {
-        private static IPronounProvider Postfix(IPronounProvider pronouns, GameObject __instance) =>
-            NamePronounWrapper.Wrap(pronouns, __instance);
+        private static IPronounProvider Postfix(IPronounProvider Pronouns, GameObject __instance) =>
+            NamePronounWrapper.Wrap(Pronouns, __instance);
     }
 }
