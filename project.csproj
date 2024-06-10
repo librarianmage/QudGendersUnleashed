@@ -3,6 +3,7 @@
     <AssemblyName>QudGendersUnleashed</AssemblyName>
     <PackageId>QudGendersUnleashed</PackageId>
     <Authors>librarianmage</Authors>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
   </PropertyGroup>
   <Import Project="../Mods.csproj" />
 </Project>

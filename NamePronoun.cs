@@ -1,7 +1,7 @@
-using HarmonyLib;
-using XRL.World;
-using XRL.Language;
 using ConsoleLib.Console;
+using HarmonyLib;
+using XRL.Language;
+using XRL.World;
 
 namespace QudGendersUnleashed.NamePronoun
 {
@@ -12,8 +12,8 @@ namespace QudGendersUnleashed.NamePronoun
     [HarmonyPatch(nameof(GameObject.GetPronounProvider))]
     public static class NameOnlyPronounPatch
     {
-        static IPronounProvider Postfix(IPronounProvider pronouns, GameObject __instance)
-            => NamePronounWrapper.Wrap(pronouns, __instance);
+        private static IPronounProvider Postfix(IPronounProvider pronouns, GameObject __instance) =>
+            NamePronounWrapper.Wrap(pronouns, __instance);
     }
 
     /// <summary>
@@ -21,46 +21,46 @@ namespace QudGendersUnleashed.NamePronoun
     /// </summary>
     public class NamePronounWrapper : IPronounProvider
     {
-        private IPronounProvider BasePronouns;
-        private GameObject Referent;
+        private readonly IPronounProvider BasePronouns;
+        private readonly GameObject Referent;
 
-        private static bool CouldHaveName(string s) => s.Contains("=name");
+        private static bool HasName(string s) => s.Contains("=name=") || s.Contains("=name's=");
 
         public static bool CouldBeNamePronouns(IPronounProvider pronouns) =>
-            CouldHaveName(pronouns.Name)
-            || CouldHaveName(pronouns.CapitalizedName)
-            || CouldHaveName(pronouns.Subjective)
-            || CouldHaveName(pronouns.CapitalizedSubjective)
-            || CouldHaveName(pronouns.Objective)
-            || CouldHaveName(pronouns.CapitalizedObjective)
-            || CouldHaveName(pronouns.PossessiveAdjective)
-            || CouldHaveName(pronouns.CapitalizedPossessiveAdjective)
-            || CouldHaveName(pronouns.SubstantivePossessive)
-            || CouldHaveName(pronouns.CapitalizedSubstantivePossessive)
-            || CouldHaveName(pronouns.Reflexive)
-            || CouldHaveName(pronouns.CapitalizedReflexive)
-            || CouldHaveName(pronouns.PersonTerm)
-            || CouldHaveName(pronouns.CapitalizedPersonTerm)
-            || CouldHaveName(pronouns.ImmaturePersonTerm)
-            || CouldHaveName(pronouns.CapitalizedImmaturePersonTerm)
-            || CouldHaveName(pronouns.FormalAddressTerm)
-            || CouldHaveName(pronouns.CapitalizedFormalAddressTerm)
-            || CouldHaveName(pronouns.OffspringTerm)
-            || CouldHaveName(pronouns.CapitalizedOffspringTerm)
-            || CouldHaveName(pronouns.SiblingTerm)
-            || CouldHaveName(pronouns.CapitalizedSiblingTerm)
-            || CouldHaveName(pronouns.ParentTerm)
-            || CouldHaveName(pronouns.CapitalizedParentTerm)
-            || CouldHaveName(pronouns.IndicativeProximal)
-            || CouldHaveName(pronouns.CapitalizedIndicativeProximal)
-            || CouldHaveName(pronouns.IndicativeDistal)
-            || CouldHaveName(pronouns.CapitalizedIndicativeDistal);
+            HasName(pronouns.Name)
+            || HasName(pronouns.CapitalizedName)
+            || HasName(pronouns.Subjective)
+            || HasName(pronouns.CapitalizedSubjective)
+            || HasName(pronouns.Objective)
+            || HasName(pronouns.CapitalizedObjective)
+            || HasName(pronouns.PossessiveAdjective)
+            || HasName(pronouns.CapitalizedPossessiveAdjective)
+            || HasName(pronouns.SubstantivePossessive)
+            || HasName(pronouns.CapitalizedSubstantivePossessive)
+            || HasName(pronouns.Reflexive)
+            || HasName(pronouns.CapitalizedReflexive)
+            || HasName(pronouns.PersonTerm)
+            || HasName(pronouns.CapitalizedPersonTerm)
+            || HasName(pronouns.ImmaturePersonTerm)
+            || HasName(pronouns.CapitalizedImmaturePersonTerm)
+            || HasName(pronouns.FormalAddressTerm)
+            || HasName(pronouns.CapitalizedFormalAddressTerm)
+            || HasName(pronouns.OffspringTerm)
+            || HasName(pronouns.CapitalizedOffspringTerm)
+            || HasName(pronouns.SiblingTerm)
+            || HasName(pronouns.CapitalizedSiblingTerm)
+            || HasName(pronouns.ParentTerm)
+            || HasName(pronouns.CapitalizedParentTerm)
+            || HasName(pronouns.IndicativeProximal)
+            || HasName(pronouns.CapitalizedIndicativeProximal)
+            || HasName(pronouns.IndicativeDistal)
+            || HasName(pronouns.CapitalizedIndicativeDistal);
 
         public static IPronounProvider Wrap(IPronounProvider basePronouns, GameObject referent)
         {
             if (basePronouns is NamePronounWrapper p && p.Referent != referent)
             {
-                p.Referent = referent;
+                return new NamePronounWrapper(p.BasePronouns, referent);
             }
             else if (CouldBeNamePronouns(basePronouns))
             {
@@ -72,20 +72,22 @@ namespace QudGendersUnleashed.NamePronoun
 
         public NamePronounWrapper(IPronounProvider basePronouns, GameObject referent)
         {
-            this.BasePronouns = basePronouns;
-            this.Referent = referent;
+            BasePronouns = basePronouns;
+            Referent = referent;
         }
 
         public string ReplaceWithName(string pronoun, bool capitalize = false)
         {
             if (pronoun.Contains("=name"))
             {
-                string displayName = Referent.BaseDisplayNameStripped;
-                if (capitalize) {
+                var displayName = Referent.BaseDisplayName;
+                if (capitalize)
+                {
                     displayName = ColorUtility.CapitalizeExceptFormatting(displayName);
                 }
-                string displayNamePossessive = Grammar.MakePossessive(displayName);
-                return pronoun.Replace("=name=", displayName)
+                var displayNamePossessive = Grammar.MakePossessive(displayName);
+                return pronoun
+                    .Replace("=name=", displayName)
                     .Replace("=name's=", displayNamePossessive);
             }
             else
@@ -108,55 +110,68 @@ namespace QudGendersUnleashed.NamePronoun
 
         public string Subjective => ReplaceWithName(BasePronouns.Subjective);
 
-        public string CapitalizedSubjective => ReplaceWithName(BasePronouns.CapitalizedSubjective, true);
+        public string CapitalizedSubjective =>
+            ReplaceWithName(BasePronouns.CapitalizedSubjective, true);
 
         public string Objective => ReplaceWithName(BasePronouns.Objective);
 
-        public string CapitalizedObjective => ReplaceWithName(BasePronouns.CapitalizedObjective, true);
+        public string CapitalizedObjective =>
+            ReplaceWithName(BasePronouns.CapitalizedObjective, true);
 
         public string PossessiveAdjective => ReplaceWithName(BasePronouns.PossessiveAdjective);
 
-        public string CapitalizedPossessiveAdjective => ReplaceWithName(BasePronouns.CapitalizedPossessiveAdjective, true);
+        public string CapitalizedPossessiveAdjective =>
+            ReplaceWithName(BasePronouns.CapitalizedPossessiveAdjective, true);
 
         public string SubstantivePossessive => ReplaceWithName(BasePronouns.SubstantivePossessive);
 
-        public string CapitalizedSubstantivePossessive => ReplaceWithName(BasePronouns.CapitalizedSubstantivePossessive);
+        public string CapitalizedSubstantivePossessive =>
+            ReplaceWithName(BasePronouns.CapitalizedSubstantivePossessive);
 
         public string Reflexive => ReplaceWithName(BasePronouns.Reflexive);
 
-        public string CapitalizedReflexive => ReplaceWithName(BasePronouns.CapitalizedReflexive, true);
+        public string CapitalizedReflexive =>
+            ReplaceWithName(BasePronouns.CapitalizedReflexive, true);
 
         public string PersonTerm => ReplaceWithName(BasePronouns.PersonTerm);
 
-        public string CapitalizedPersonTerm => ReplaceWithName(BasePronouns.CapitalizedPersonTerm, true);
+        public string CapitalizedPersonTerm =>
+            ReplaceWithName(BasePronouns.CapitalizedPersonTerm, true);
 
         public string ImmaturePersonTerm => ReplaceWithName(BasePronouns.ImmaturePersonTerm);
 
-        public string CapitalizedImmaturePersonTerm => ReplaceWithName(BasePronouns.CapitalizedImmaturePersonTerm, true);
+        public string CapitalizedImmaturePersonTerm =>
+            ReplaceWithName(BasePronouns.CapitalizedImmaturePersonTerm, true);
 
         public string FormalAddressTerm => ReplaceWithName(BasePronouns.FormalAddressTerm);
 
-        public string CapitalizedFormalAddressTerm => ReplaceWithName(BasePronouns.CapitalizedFormalAddressTerm, true);
+        public string CapitalizedFormalAddressTerm =>
+            ReplaceWithName(BasePronouns.CapitalizedFormalAddressTerm, true);
 
         public string OffspringTerm => ReplaceWithName(BasePronouns.OffspringTerm);
 
-        public string CapitalizedOffspringTerm => ReplaceWithName(BasePronouns.CapitalizedOffspringTerm, true);
+        public string CapitalizedOffspringTerm =>
+            ReplaceWithName(BasePronouns.CapitalizedOffspringTerm, true);
 
         public string SiblingTerm => ReplaceWithName(BasePronouns.SiblingTerm);
 
-        public string CapitalizedSiblingTerm => ReplaceWithName(BasePronouns.CapitalizedSiblingTerm, true);
+        public string CapitalizedSiblingTerm =>
+            ReplaceWithName(BasePronouns.CapitalizedSiblingTerm, true);
 
         public string ParentTerm => ReplaceWithName(BasePronouns.ParentTerm);
 
-        public string CapitalizedParentTerm => ReplaceWithName(BasePronouns.CapitalizedParentTerm, true);
+        public string CapitalizedParentTerm =>
+            ReplaceWithName(BasePronouns.CapitalizedParentTerm, true);
 
         public string IndicativeProximal => ReplaceWithName(BasePronouns.IndicativeProximal);
 
-        public string CapitalizedIndicativeProximal => ReplaceWithName(BasePronouns.CapitalizedIndicativeProximal, true);
+        public string CapitalizedIndicativeProximal =>
+            ReplaceWithName(BasePronouns.CapitalizedIndicativeProximal, true);
 
         public string IndicativeDistal => ReplaceWithName(BasePronouns.IndicativeDistal);
 
-        public string CapitalizedIndicativeDistal => ReplaceWithName(BasePronouns.CapitalizedIndicativeDistal, true);
+        public string CapitalizedIndicativeDistal =>
+            ReplaceWithName(BasePronouns.CapitalizedIndicativeDistal, true);
 
         public bool UseBareIndicative => BasePronouns.UseBareIndicative;
     }
