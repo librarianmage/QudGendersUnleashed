@@ -8,7 +8,6 @@ using XRL.World;
 namespace QudGendersUnleashed.Patches
 {
     /// <summary>Patch the gender selector for during character creation.</summary>
-    /// <seealso cref="QudCustomizeCharacterModuleWindow.OnChooseGenderAsync"/>
     [HarmonyPatch(typeof(QudCustomizeCharacterModuleWindow))]
     [HarmonyPatch(nameof(QudCustomizeCharacterModuleWindow.OnChooseGenderAsync))]
     public static class GenderPatch
@@ -24,7 +23,6 @@ namespace QudGendersUnleashed.Patches
     }
 
     /// <summary>Patch the pronoun set selector for during character creation.</summary>
-    /// <seealso cref="QudCustomizeCharacterModuleWindow.OnChoosePronounSetAsync"/>
     [HarmonyPatch(typeof(QudCustomizeCharacterModuleWindow))]
     [HarmonyPatch(nameof(QudCustomizeCharacterModuleWindow.OnChoosePronounSetAsync))]
     public static class PronounPatch
