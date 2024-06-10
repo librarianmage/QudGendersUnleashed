@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ConsoleLib.Console;
 using XRL;
 using XRL.CharacterBuilds.Qud.UI;
 using XRL.UI;
@@ -12,97 +11,15 @@ using XRL.World;
 namespace QudGendersUnleashed
 {
     /// <summary>Selectors for gender and pronoun sets.</summary>
-    [HasModSensitiveStaticCache]
     public static class Selectors
     {
-        private static readonly string FromGenderText = Markup.Color("W", "<from gender>");
-        private static readonly string CreateNewText = Markup.Color("W", "<create new>");
-
-        [ModSensitiveStaticCache]
-        private static Dictionary<PronounSet, Gender> _PronounGenderMapping;
-
-        public static Dictionary<PronounSet, Gender> PronounGenderMapping
-        {
-            get
-            {
-                if (_PronounGenderMapping == null)
-                {
-                    _PronounGenderMapping = new Dictionary<PronounSet, Gender>();
-
-                    var suspects = Gender.Find(g => !g.DoNotReplicateAsPronounSet);
-                    foreach (var g in suspects)
-                    {
-                        var setName = new PronounSet(g).Name;
-                        var set = PronounSet.GetIfExists(setName);
-                        if (set != null)
-                        {
-                            _PronounGenderMapping[set] = g;
-                        }
-                    }
-                }
-
-                return _PronounGenderMapping;
-            }
-        }
-
-        private static string FormatName(string name, string color = "M")
-        {
-            if (ColorUtility.HasFormatting(name))
-            {
-                return Markup.Color("y", name);
-            }
-            else
-            {
-                return Markup.Color(color, name);
-            }
-        }
-
-        private static string FormatGender(Gender g)
-        {
-            var name = FormatName(g.Name);
-            var summary = Markup.Color("c", g.GetBasicSummary());
-
-            return $"{name}\n{summary}";
-        }
-
-        private static string FormatPronounSet(PronounSet p)
-        {
-            var name = FormatName(p.GetShortName());
-
-            var extra = "";
-
-            if (PronounGenderMapping.TryGetValue(p, out var g))
-            {
-                extra = Markup.Color("m", $" (from {FormatName(g.Name, "m")})");
-            }
-
-            var summary = Markup.Color("c", p.GetBasicSummary());
-
-            return $"{name}{extra}\n{summary}";
-        }
-
-        private static string FormatFromGenderPronounOption(Gender g1)
-        {
-            var g = g1 ?? Gender.Get("nonspecific");
-            if (g == null)
-            {
-                return FromGenderText;
-            }
-
-            var gName = FormatName(g.Name, "m");
-
-            var extra = Markup.Color("m", $"({gName})");
-
-            var summary = Markup.Color("c", g.GetBasicSummary());
-
-            return $"{FromGenderText} {extra}\n{summary}";
-        }
-
         public static async Task<Gender> ChooseGenderAsync(Gender current)
         {
             var availableGenders = Gender.GetAllPersonal();
-            var options = availableGenders.Select(gender => FormatGender(gender)).ToList();
-            options.Add(CreateNewText);
+            var options = availableGenders
+                .Select(gender => Formatting.FormatGender(gender))
+                .ToList();
+            options.Add(Formatting.CreateNewText);
 
             var initial = availableGenders.IndexOf(current);
             if (initial < 0)
@@ -170,11 +87,14 @@ namespace QudGendersUnleashed
         )
         {
             var availablePronounSets = PronounSet.GetAllPersonal();
-            var options = new List<string> { FormatFromGenderPronounOption(currentGender) };
+            var options = new List<string>
+            {
+                Formatting.FormatFromGenderPronounOption(currentGender)
+            };
             options.AddRange(
-                availablePronounSets.Select(pronounSet => FormatPronounSet(pronounSet))
+                availablePronounSets.Select(pronounSet => Formatting.FormatPronounSet(pronounSet))
             );
-            options.Add(CreateNewText);
+            options.Add(Formatting.CreateNewText);
 
             int initialPos,
                 newPos;
