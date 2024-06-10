@@ -4,9 +4,9 @@ A mod that works in conjunction with the [Gender and Pronoun Sets](https://steam
 
 Specifically, this mod allows you to pick from all personal genders and pronouns defined in game (including pseudo-plural ones), with a number of additions.
 
-Additionally, all gender and pronoun prompts have been redesigned with inspirations from kernelmethod's [Better Pet Selector](https://steamcommunity.com/sharedfiles/filedetails/?id=3006503292) mod.
+Additionally, all gender and pronoun prompts have been redesigned with inspiration from kernelmethod's [Better Pet Selector](https://steamcommunity.com/sharedfiles/filedetails/?id=3006503292).
 
-Tested to work on game versions 204.100 / 205.54 (beta).
+Tested to work on game version 207.67.
 
 [Source Code (GitHub)](https://github.com/librarianmage/QudGendersUnleashed) \| [Workshop Page](https://steamcommunity.com/sharedfiles/filedetails/?id=2815078000) \| [My Caves of Qud Mods (Steam Workshop)](https://steamcommunity.com/profiles/76561198836298826/myworkshopfiles/?appid=333640)
 
