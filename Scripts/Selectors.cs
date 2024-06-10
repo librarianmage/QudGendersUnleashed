@@ -136,7 +136,7 @@ namespace QudGendersUnleashed
             }
             else if (1 <= n && n < options.Count - 1)
             {
-                return availablePronounSets[n];
+                return availablePronounSets[n - 1];
             }
             else
             {
