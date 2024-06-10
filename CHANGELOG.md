@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.6 — 2024-06-10
+Tested to work on game version 207.67
+
+* Fix off-by-one error in pronoun selection
+
 ## v1.5 — 2023-08-15
 Tested to work on game versions 204.100 / 205.54 (beta)
 
