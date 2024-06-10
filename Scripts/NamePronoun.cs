@@ -1,21 +1,9 @@
 using ConsoleLib.Console;
-using HarmonyLib;
 using XRL.Language;
 using XRL.World;
 
 namespace QudGendersUnleashed.NamePronoun
 {
-    /// <summary>
-    ///   Wraps the <see cref="IPronounProvider"/> returned by <see cref="GameObject.GetPronounProvider"/> with a <see cref="NamePronounWrapper" />.
-    /// </summary>
-    [HarmonyPatch(typeof(GameObject))]
-    [HarmonyPatch(nameof(GameObject.GetPronounProvider))]
-    public static class NameOnlyPronounPatch
-    {
-        private static IPronounProvider Postfix(IPronounProvider pronouns, GameObject __instance) =>
-            NamePronounWrapper.Wrap(pronouns, __instance);
-    }
-
     /// <summary>
     ///   Wraps a <see cref="IPronounProvider"/>, replacing <c>=name=</c>/<c>=name's=</c> with the name of the pronouns' referent.
     /// </summary>

@@ -1,12 +1,14 @@
 using System.Threading.Tasks;
 using HarmonyLib;
+using QudGendersUnleashed.NamePronoun;
 using XRL;
 using XRL.CharacterBuilds.Qud.UI;
 using XRL.World;
 
 namespace QudGendersUnleashed.Patches
 {
-    /// <summary>Patch the gender selector during character creation.</summary>
+    /// <summary>Patch the gender selector for during character creation.</summary>
+    /// <seealso cref="QudCustomizeCharacterModuleWindow.OnChooseGenderAsync"/>
     [HarmonyPatch(typeof(QudCustomizeCharacterModuleWindow))]
     [HarmonyPatch(nameof(QudCustomizeCharacterModuleWindow.OnChooseGenderAsync))]
     public static class GenderPatch
@@ -21,7 +23,8 @@ namespace QudGendersUnleashed.Patches
         }
     }
 
-    /// <summary>Patch the pronoun set selector during character creation.</summary>
+    /// <summary>Patch the pronoun set selector for during character creation.</summary>
+    /// <seealso cref="QudCustomizeCharacterModuleWindow.OnChoosePronounSetAsync"/>
     [HarmonyPatch(typeof(QudCustomizeCharacterModuleWindow))]
     [HarmonyPatch(nameof(QudCustomizeCharacterModuleWindow.OnChoosePronounSetAsync))]
     public static class PronounPatch
@@ -40,7 +43,7 @@ namespace QudGendersUnleashed.Patches
         }
     }
 
-    /// <summary>Patch the pronoun set selector from the character sheet.</summary>
+    /// <summary>Patch the pronoun set selector for the (old-style) character sheet.</summary>
     [HarmonyPatch(typeof(PronounAndGenderSets))]
     [HarmonyPatch(nameof(PronounAndGenderSets.ShowChangePronounSet))]
     public static class PlaytimePronounPatch
@@ -50,5 +53,16 @@ namespace QudGendersUnleashed.Patches
             Selectors.ChoosePronounSet();
             return false;
         }
+    }
+
+    /// <summary>
+    ///   Wraps the <see cref="IPronounProvider"/> returned by <see cref="GameObject.GetPronounProvider"/> with a <see cref="NamePronounWrapper" />.
+    /// </summary>
+    [HarmonyPatch(typeof(GameObject))]
+    [HarmonyPatch(nameof(GameObject.GetPronounProvider))]
+    public static class NameOnlyPronounPatch
+    {
+        private static IPronounProvider Postfix(IPronounProvider pronouns, GameObject __instance) =>
+            NamePronounWrapper.Wrap(pronouns, __instance);
     }
 }
